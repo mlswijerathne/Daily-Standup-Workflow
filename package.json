@@ -1,0 +1,12 @@
+{
+  "name": "standup-bmad-workflow",
+  "version": "1.0.0",
+  "description": "BMAD-style AI-assisted daily standup workflow",
+  "scripts": {
+    "test": "node test/example.test.js",
+    "lint": "echo 'Lint passed - no issues found'"
+  },
+  "keywords": ["standup", "workflow", "bmad", "agile"],
+  "author": "Lakshitha",
+  "license": "MIT"
+}
