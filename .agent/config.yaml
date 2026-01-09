@@ -1,0 +1,95 @@
+version: "1.0"
+project_name: "Daily Standup BMAD Workflow"
+description: "BMAD-style daily standup using Antigravity"
+
+# Directory configuration
+workflows_dir: ".agent/workflows"
+artifacts_dir: ".agent/artifacts"
+docs_dir: "docs"
+
+# Tool configuration
+tools:
+  - name: git
+    enabled: true
+    commands:
+      - log
+      - show
+      - diff
+      - status
+  
+  - name: test
+    enabled: true
+    command: "npm test"
+    timeout: 60  # seconds
+  
+  - name: lint
+    enabled: true
+    command: "npm run lint"
+    timeout: 30  # seconds
+
+# Scheduling configuration
+daily_schedule: "08:30"  # Run workflow at 8:30 AM local time
+timezone: "Asia/Colombo"  # Sri Lanka timezone
+
+# Artifact management
+max_artifacts: 10
+artifact_retention_days: 30
+
+# Team configuration
+team:
+  name: "Development Team"
+  sprint_prefix: "Sprint"
+  current_sprint: 15
+  
+  members:
+    - name: "Lakshitha"
+      email: "lakshitha@company.com"
+      role: "developer"
+      github_username: "mlswijerathne"
+    
+    - name: "Samantha"
+      email: "samantha@company.com"
+      role: "developer"
+      github_username: "samantha-dev"
+    
+    - name: "Rohan"
+      email: "rohan@company.com"
+      role: "developer"
+      github_username: "rohan-dev"
+
+# Ticket system integration (for future use)
+integrations:
+  jira:
+    enabled: false
+    base_url: "https://your-jira.atlassian.net"
+    project_key: "PROJ"
+  
+  confluence:
+    enabled: false
+    base_url: "https://your-confluence.atlassian.net"
+    space_key: "DEV"
+  
+  slack:
+    enabled: false
+    webhook_url: "${SLACK_WEBHOOK_URL}"
+    channel: "#daily-standup"
+
+# Security settings
+security:
+  scan_for_secrets: true
+  redact_emails: false
+  redact_usernames: false
+  blocked_patterns:
+    - "password"
+    - "secret"
+    - "api_key"
+    - "token"
+    - "credential"
+
+# Standup configuration
+standup:
+  max_commits_to_show: 20
+  lookback_hours: 24
+  summary_max_words: 500
+  include_metrics: true
+  include_blockers: true

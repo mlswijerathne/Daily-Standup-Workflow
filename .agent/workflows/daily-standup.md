@@ -1,5 +1,13 @@
 ---
+name: "Daily Standup Workflow"
 description: "BMAD-style AI-assisted daily standup: collect updates, run checks, document, summarize"
+version: "1.0"
+roles:
+  - analyst
+  - dev
+  - documentor
+  - scrum_master
+  - security
 ---
 
 # Daily Standup Workflow (BMAD-Style)
@@ -12,7 +20,7 @@ This workflow automates the daily standup preparation by:
 3. **Documenting** status in a shared doc.
 4. **Summarizing** for the standup meeting.
 
-Human-in-the-middle: you always review and approve before sharing.
+**Human-in-the-middle**: You always review and approve before sharing.
 
 ---
 
@@ -21,6 +29,7 @@ Human-in-the-middle: you always review and approve before sharing.
 - Repo contains git history with recent commits.
 - A test or lint command works (e.g., `npm test`).
 - Write access to `docs/standups/` folder.
+- Team configuration in `.agent/config.yaml`.
 
 ---
 
@@ -175,7 +184,7 @@ Human-in-the-middle: you always review and approve before sharing.
 
 ---
 
-### Step 4: Security / Quality Check (Optional Sub-Agent Role)
+### Step 4: Security / Quality Check (Security Role)
 
 **Objective**: Ensure no sensitive data is leaked in the summary.
 
@@ -183,10 +192,11 @@ Human-in-the-middle: you always review and approve before sharing.
 
 1. Review the `step1_raw_updates` and `step2_checks_results` artifacts.
 
-2. Check for:
+2. Check for (as defined in `.agent/config.yaml`):
    - API keys, passwords, or credentials in commit messages.
    - Stack traces or error details that shouldn't be public.
    - Usernames that should be anonymized.
+   - Patterns matching: password, secret, api_key, token, credential
 
 3. Create an **Artifact** named `step4_security_check.md`:
    ```markdown
@@ -219,7 +229,9 @@ Human-in-the-middle: you always review and approve before sharing.
 
 1. Synthesize all previous steps into a concise summary.
 
-2. Create an **Artifact** named `step5_standup_summary.md`:
+2. Load team members from `.agent/config.yaml` for per-person summary.
+
+3. Create an **Artifact** named `step5_standup_summary.md`:
    ```markdown
    # Daily Standup Summary – YYYY-MM-DD
 
@@ -261,7 +273,7 @@ Human-in-the-middle: you always review and approve before sharing.
    Generated: YYYY-MM-DD HH:MM AM/PM
    ```
 
-3. Present to user:
+4. Present to user:
    > "Here's your standup summary, ready to be read in the meeting. Do you want to edit anything before sharing it with the team?"
 
 ---
@@ -312,3 +324,29 @@ Human-in-the-middle: you always review and approve before sharing.
 - ✅ Daily standup document is created and saved.
 - ✅ Standup summary is concise and actionable.
 - ✅ Team uses the summary to conduct the standup efficiently.
+
+---
+
+## Future Enhancements
+
+### Jira Integration
+```bash
+curl -H "Authorization: Bearer $JIRA_TOKEN" \
+  "https://your-jira.atlassian.net/rest/api/3/search?jql=updated>=1d" \
+  | jq '.issues[] | {key, summary, status}'
+```
+
+### Confluence Upload
+```bash
+curl -X POST \
+  -H "Authorization: Bearer $CONFLUENCE_TOKEN" \
+  "https://your-confluence.atlassian.net/rest/api/3/pages" \
+  -d @docs/standups/$(date +%Y-%m-%d).md
+```
+
+### Slack Notification
+```bash
+curl -X POST $SLACK_WEBHOOK \
+  -d '{"text": "Daily Standup Summary…"}' \
+  -H 'Content-Type: application/json'
+```
